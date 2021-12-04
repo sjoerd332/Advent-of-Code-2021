@@ -11,6 +11,7 @@ class board:
         self.ticks = [[0]*len(nrs[0]) for _ in range(len(nrs))]
         self.rb = [0]*len(nrs[0]) # is a column of row bingo status
         self.cb = [0]*len(nrs)    # is a row of column bingo status
+        self.bingo = False
 
     def checkRowBingo(self):
         anyBingo = False
@@ -21,6 +22,7 @@ class board:
             if bingo:
                 self.rb[j] = 1
                 anyBingo = True
+                self.bingo = True
         return anyBingo
 
     def checkColBingo(self):
@@ -87,21 +89,26 @@ class game:
 
     def play(self):
         ans1 = 0
+        self.bingos = []
         print('nrs: ')
         for nr in self.drawSeq:
             print(nr + ', ')
             nr = int(nr)
-            if ans1 == 0:
-                for j in range(len(self.boards)):
-                    bingo = self.boards[j].playTurn(nr)
-                    if bingo:
-                        ans1 = nr * self.boards[j].calcScore()
-                        print('nr: ' + str(nr) + '\tans1: ' + str(ans1))
-                        break
-        return ans1
+            
+            for board in range(len(self.boards)):
+                bingo = self.boards[board].playTurn(nr)
+                if bingo:
+                    score = nr * self.boards[board].calcScore()
+                    if ans1 == 0:
+                        ans1 = score
+                    if board not in [b[0] for b in self.bingos]:
+                            self.bingos.append([board, score])
+                            print('nr: ' + str(nr) + '\tboard: '+ str(board) + '\tans1: ' + str(score))
+        ans2 = self.bingos[-1][1]
+        return [ans1, ans2]
         
 game1 = game(values)
-game1.play()
+[a1, a2] = game1.play()
         
         
         
